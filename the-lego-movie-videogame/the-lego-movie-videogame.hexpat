@@ -5,6 +5,7 @@ import std.mem;
 import std.string;
 
 struct header_t {
+	u32 crc32Offset @ 0x00;
 	u8 lastPlayedOffset @ 0x05;
 	u8 challengeOffset @ 0x07;
 	char signature[16] @ 0x08;
@@ -38,7 +39,7 @@ struct ChallengeLvls {
 	name("Level #" + std::string::to_string(LvlCounter))
 ]];
 
-struct profile1_t { // profile starts at 28
+struct profile_t {
 	padding[7];
 	ChallengeLvls challengelvls[45];
 	padding[95];
@@ -56,8 +57,8 @@ struct profile1_t { // profile starts at 28
 };
 
 struct Chunks {
-	profile1_t profile1_chunk [[comment("Profile 1")]];
-	profile1_t profile2_chunk [[comment("Profile 2")]];
+	profile_t profile1_chunk [[comment("Profile 1")]];
+	profile_t profile2_chunk [[comment("Profile 2")]];
 };
 
 header_t header @ 0x00 [[comment("Contains the data outside the profiles."), name("Main game")]];

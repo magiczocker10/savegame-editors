@@ -1,7 +1,11 @@
+#pragma author magiczocker10
+#pragma description Nintendogs+Cats save data
+
+import type.time;
 struct main_t {
 	char16 miiNameOffset[10] @ 0x36;
 	u32 moneyOffset @ 0xA0;
-	u32 lastsavedOffset @ 0x10;
+	type::time32_t lastsavedOffset @ 0x10;
 	u32 streetpassMetOffset @ 0x98;
 	u32 ownerPointsOffset @ 0x9C;
 	u32 pedometerOffset @ 0x218;

@@ -3,12 +3,16 @@
 
 import type.time;
 struct main_t {
-	char16 miiNameOffset[10] @ 0x36;
-	u32 moneyOffset @ 0xA0;
-	type::time32_t lastsavedOffset @ 0x10;
-	u32 streetpassMetOffset @ 0x98;
-	u32 ownerPointsOffset @ 0x9C;
-	u32 pedometerOffset @ 0x218;
+	char16 miiNameOffset[10] @ 0x36 [[name("Mii name")]];
+	u32 moneyOffset @ 0xA0 [[name("Money balance")]];
+	type::time32_t lastsavedOffset @ 0x10 [[name("Last saved")]];
+	u32 streetpassMetOffset @ 0x98 [[name("Streetpass Met")]];
+	u32 ownerPointsOffset @ 0x9C [[name("Owner Points")]];
+	u32 pedometerOffset @ 0x218 [[name("Pedometer")]];
+	u8 activeFurnitureTopRight @ 0x211 [[name("Active furniture - Top right")]];
+	u8 activeFurnitureTopLeft @ 0x212 [[name("Active furniture - Top left")]];
+	u8 activeFurnitureBottomLeft @ 0x213 [[name("Active furniture - Bottom left")]];
+	u8 activeFurnitureBottomRight @ 0x214 [[name("Active furniture - Bottom right")]];
 };
 
 struct accessories_t {

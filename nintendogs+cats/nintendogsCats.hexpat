@@ -4,6 +4,7 @@
 import type.time;
 struct main_t {
 	char16 miiNameOffset[10] @ 0x36 [[name("Mii name")]];
+	u8 miiAvatarDesign[50] @ 0x4A [[name("Specifies the mii avatar design.")]];
 	u32 moneyOffset @ 0xA0 [[name("Money balance")]];
 	type::time32_t lastsavedOffset @ 0x10 [[name("Last saved")]];
 	u32 streetpassMetOffset @ 0x98 [[name("Streetpass Met")]];

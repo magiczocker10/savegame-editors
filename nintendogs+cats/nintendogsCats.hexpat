@@ -350,26 +350,28 @@ struct trick_t {
 };
 
 struct pet_t {
-	u8 petStartOffset; // 0
-	padding[49]; // 48
-	u8 breedOffset [[name("0=Spaniel,1=Blentheim,...")]]; // 50
-	u8 breedVariantOffset; // 51
-	u8 breedStyleOffset [[name("Hairstyle")]]; // 52
-	u8 breedEyeColorOffset [[name("Eye Color")]]; // 53
-	u8 breedFurColorOffset [[name("Fur Color")]]; // 54
-	padding[11]; // 65
-	char16 nameOffset[10]; // 85
-	u8 genderOffset [[name("Gender (0=Male, 1=Female)")]]; // 86
-
-	if (breedOffset > 28 && breedOffset < 32) { // Cat
-		padding[3];
-		u32 pointsOffset; // 90
-		
-	} else { // Dog
-		padding[11]; // 97
-		u32 pointsOffset; // 98
+	u8 petStartOffset;
+	padding[49];
+	u8 breedOffset [[name("0=Spaniel,1=Blentheim,...")]];
+	u8 breedVariantOffset [[name("Breed-Variant")]];
+	u8 breedStyleOffset [[name("Hairstyle")]];
+	u8 breedEyeColorOffset [[name("Eye Color")]];
+	u8 breedFurColorOffset [[name("Fur Color")]];
+	padding[11];
+	char16 nameOffset[10] [[name("Name")]];
+	u8 genderOffset [[name("Gender (0=Male, 1=Female)")]];
+	u8 currentHat [[name("Hat")]]; // Active hat-clothing
+	u8 currentGlasses [[name("Glasses")]]; // Active glasses
+	u8 currentNeck [[name("Neck")]]; // Active neck-clothing: Necklace, Scarf, etc.
+	if (breedOffset < 29 || breedOffset > 31) { // Dog only
+		u8 competitionsData[8] [[name("Competition-data")]];
 	}
-	padding[404];
+	u32 pointsOffset [[name("Points")]];
+	padding[28];
+	u32 hungerOffset [[name("Hunger")]];
+	u32 thirstOffset [[name("Thirst")]];
+	u32 coatOffset [[name("Coat")]];
+	padding[364];
 	u8 personalitiesOffset1;
 	padding[3];
 	u8 personalitiesOffset2;

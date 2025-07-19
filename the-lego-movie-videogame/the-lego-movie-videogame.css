@@ -1,0 +1,5 @@
+.upgrade-icon,
+.character-icon {
+	pointer-events: none;
+	user-select: none;
+}

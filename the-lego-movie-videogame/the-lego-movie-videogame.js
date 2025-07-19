@@ -1,15 +1,13 @@
-/* eslint-disable no-bitwise, no-underscore-dangle */
-/* globals
-	col, get, getField, getValue, SavegameEditor, select, setNumericRange, setValue, span, tempFile
-*/
+/* eslint-disable no-console */
+/* eslint-disable max-len */
 /*
 	The Lego Movie Videogame for HTML5 Save Editor v20160704
 	by Marc Robledo 2016
 */
-function convertToBit( d, l ) {
+'use_strict';
+function convert_to_bit( d, l ) {
 	return ( '0000000000000000' + ( d >>> 0 ).toString( 2 ) ).slice( 0 - l ).split( '' );
 }
-// eslint-disable-next-line no-implicit-globals, no-global-assign
 SavegameEditor = {
 	Name: 'The Lego Movie Videogame',
 	Filename: 'savegame.dat',
@@ -24,7 +22,6 @@ SavegameEditor = {
 			{ value: 1, name: 'Unlocked' },
 			{ value: 2, name: 'Unlocked+Bought' }
 		],
-		// eslint-disable-next-line max-len
 		SETTINGS_MUSIC_MICROPHONE_OFFSET: 0x18, // 00=All OFF, A0=Music ON, 0A=Microphone ON, AA=All ON
 		LANGUAGE_OFFSET: 0x19,
 		LANGUAGES: [
@@ -69,7 +66,8 @@ SavegameEditor = {
 		return crcTable;
 	}() ),
 	crc32: function ( file, len, offset ) {
-		const data = file.readBytes( offset, len - offset );
+		const self = this,
+			data = file.readBytes( offset, len - offset );
 		let byte = 0b0,
 			checksum = 0xFF;
 		for ( let i = 0; i < data.length; i++ ) {
@@ -78,79 +76,75 @@ SavegameEditor = {
 			byte ^= cs_;
 			byte &= 0xff;
 			const cs___ = ( i === 0 ? cs_ : checksum );
-			const a = SavegameEditor.CRC32_TABLE[ byte ];
+			const a = self.CRC32_TABLE[ byte ];
 			checksum = a ^ ( cs___ >>> 8 );
 		}
-		return ( ( checksum >>> 0 ) << 0 );
+		return ( ( checksum >>> 0 ) << 0 ) >>> 0;
 	},
 	_getProfileOffset: function () {
-		return this.Constants.PROFILES[ Number( getValue( 'profile-selector' ) ) - 1 ].offset;
+		return SavegameEditor.Constants.PROFILES[ Number( getValue( 'profile-selector' ) ) - 1 ].offset;
 	},
-	_getSectionStatus: function ( s ) {
-		const amount = Math.ceil( 1.5 * s ),
-			offset = SavegameEditor._getProfileOffset() +
-			SavegameEditor.Constants.SECTION_UNLOCK_OFFSET;
-		let result = '';
-		for ( let i = 0; i < amount; i++ ) {
-			result = convertToBit( tempFile.readU8( offset + i ), 8 ).join( '' ) + result;
-		}
-		result = result.slice( 0, result.length - 12 * ( s - 1 ) ).slice( -12 );
-		return parseInt( result, 2 );
-	},
-	_writeSectionStatus: function ( e ) {
-		const offset = SavegameEditor._getProfileOffset() +
-				SavegameEditor.Constants.SECTION_UNLOCK_OFFSET,
-			s = e.target.dataset.section,
-			status = getValue( 'section-status-' + s ),
-			toWrite = [],
+	_get_section_status: function ( s ) {
+		const offset = SavegameEditor._getProfileOffset() + SavegameEditor.Constants.SECTION_UNLOCK_OFFSET,
 			amount = Math.ceil( 1.5 * s );
 		let result = '';
 		for ( let i = 0; i < amount; i++ ) {
-			result = convertToBit( tempFile.readU8( offset + i ), 8 ).join( '' ) + result;
+			result = convert_to_bit( tempFile.readU8( offset + i ), 8 ).join( '' ) + result;
 		}
-		result = result.slice( 0, result.length - 12 * ( s ) ) +
-			convertToBit( status, 12 ).join( '' ) +
-			result.slice( result.length - 12 * ( s - 1 ), result.length );
+		result = result.slice( 0, Math.max( 0, result.length - 12 * ( s - 1 ) ) ).slice( -12 );
+		return parseInt( result, 2 );
+	},
+	_write_section_status: function ( e ) {
+		const s = e.target.dataset.section,
+			status = getValue( 'section-status-' + s ),
+			offset = SavegameEditor._getProfileOffset() + SavegameEditor.Constants.SECTION_UNLOCK_OFFSET,
+			to_write = [],
+			amount = Math.ceil( 1.5 * s );
+		let result = '';
+		for ( let i = 0; i < amount; i++ ) {
+			result = convert_to_bit( tempFile.readU8( offset + i ), 8 ).join( '' ) + result;
+		}
+		result = result.slice( 0, Math.max( 0, result.length - 12 * ( s ) ) ) + convert_to_bit( status, 12 ).join( '' ) + result.slice( result.length - 12 * ( s - 1 ), result.length );
 		for ( let j = 0; j < result.length; j += 8 ) {
-			toWrite.unshift( result.slice( j, j + 8 ) );
+			to_write.unshift( result.slice( j, j + 8 ) );
 		}
-		for ( let k = 0; k < toWrite.length; k++ ) {
+		for ( let k = 0; k < to_write.length; k++ ) {
 			tempFile.writeU8(
 				offset + k,
-				parseInt( toWrite[ k ], 2 )
+				parseInt( to_write[ k ], 2 )
 			);
 		}
 	},
-	_writeLanguage: function () {
+	_write_language: function () {
 		tempFile.writeU8(
 			SavegameEditor.Constants.LANGUAGE_OFFSET,
 			getValue( 'language' )
 		);
 	},
-	_getLevelStoneOffset: function () {
+	_get_level_stone_offset: function () {
 		const profileStartOffset = SavegameEditor._getProfileOffset();
 		return profileStartOffset + SavegameEditor.Constants.YELLOW_STONE_OFFSET + Number( getValue( 'levels' ) ) * 8;
 	},
-	_writeLevelStones: function () {
+	_write_level_stones: function () {
 		tempFile.writeU24(
-			SavegameEditor._getLevelStoneOffset(),
+			SavegameEditor._get_level_stone_offset(),
 			getValue( 'level-stones' )
 		);
 	},
-	_writeBlueStones: function () {
+	_write_blue_stones: function () {
 		const profileStartOffset = SavegameEditor._getProfileOffset();
 		tempFile.writeU24(
 			profileStartOffset + SavegameEditor.Constants.BLUE_STONES_OFFSET,
 			getValue( 'blue-stones' )
 		);
 	},
-	_writeSoundSettings: function () {
+	_write_sound_settings: function () {
 		tempFile.writeU8(
 			SavegameEditor.Constants.SETTINGS_MUSIC_MICROPHONE_OFFSET,
 			( getField( 'checkbox-microphone' ).checked ? 10 : 0 ) + ( getField( 'checkbox-music' ).checked ? 160 : 0 )
 		);
 	},
-	_writeLastPlayed: function () {
+	_write_last_played: function () {
 		tempFile.writeU8(
 			SavegameEditor.Constants.LEVEL_LAST_PLAYED_OFFSET,
 			getValue( 'last-played' )
@@ -160,12 +154,10 @@ SavegameEditor = {
 			getValue( 'last-played' )
 		);
 	},
-	_writeCharacter: function ( e ) {
+	_write_character: function ( e ) {
 		const profileStartOffset = SavegameEditor._getProfileOffset(),
-			offset = profileStartOffset +
-				SavegameEditor.Constants.CHARACTER_OFFSET +
-				Number( e.target.dataset.offset ),
-			bits = convertToBit( tempFile.readU8( offset ), 8 ),
+			offset = profileStartOffset + SavegameEditor.Constants.CHARACTER_OFFSET + Number( e.target.dataset.offset ),
+			bits = convert_to_bit( tempFile.readU8( offset ), 8 ),
 			val = getValue( e.target.id );
 		bits[ e.target.dataset.offset_ * 2 ] = ( val === '2' ? '1' : '0' );
 		bits[ e.target.dataset.offset_ * 2 + 1 ] = ( val !== '0' ? '1' : '0' );
@@ -174,20 +166,18 @@ SavegameEditor = {
 			parseInt( bits.join( '' ), 2 )
 		);
 	},
-	_writeChallenge: function ( e ) {
+	_write_challenge: function ( e ) {
 		const lvl = Number( getValue( 'levels' ) );
 		tempFile.writeU8(
-			SavegameEditor._getProfileOffset() +
-			SavegameEditor.Constants.CHALLENGE_OFFSET + ( lvl ) * 10 +
-			Number( e.target.dataset.challenge ),
+			SavegameEditor._getProfileOffset() + SavegameEditor.Constants.CHALLENGE_OFFSET + ( lvl ) * 10 + Number( e.target.dataset.challenge ),
 			e.target.checked === true ? '1' : '0'
 		);
 	},
-	_writeUpgrade: function ( e ) {
-		const offset = SavegameEditor._getProfileOffset() +
-				SavegameEditor.Constants.UPGRADES_OFFSET,
-			bitsUnlocked = convertToBit( tempFile.readU16( offset ), 16 ),
-			bitsBought = convertToBit( tempFile.readU16( offset + 2 ), 16 ),
+	_write_upgrade: function ( e ) {
+		const profileStartOffset = SavegameEditor._getProfileOffset(),
+			offset = profileStartOffset + SavegameEditor.Constants.UPGRADES_OFFSET,
+			bitsUnlocked = convert_to_bit( tempFile.readU16( offset ), 16 ),
+			bitsBought = convert_to_bit( tempFile.readU16( offset + 2 ), 16 ),
 			val = getValue( e.target.id );
 		bitsBought[ e.target.dataset.offset ] = ( val === '2' ? '1' : '0' );
 		bitsUnlocked[ e.target.dataset.offset ] = ( val !== '0' ? '1' : '0' );
@@ -200,54 +190,55 @@ SavegameEditor = {
 			parseInt( bitsBought.join( '' ), 2 )
 		);
 	},
-	_loadLevel: function () {
-		const lvl = Number( getValue( 'levels' ) ),
-			profileStartOffset = SavegameEditor._getProfileOffset();
-		setValue( 'level-stones', tempFile.readU24( SavegameEditor._getLevelStoneOffset() ) );
+	_load_level: function () {
+		const profileStartOffset = SavegameEditor._getProfileOffset(),
+			lvl = Number( getValue( 'levels' ) );
+		setValue( 'level-stones', tempFile.readU24( SavegameEditor._get_level_stone_offset() ) );
 		for ( let i = 0; i < 10; i++ ) {
-			getField( 'challenge-' + ( i + 1 ) + '-unlocked' ).checked = tempFile.readU8( profileStartOffset + SavegameEditor.Constants.CHALLENGE_OFFSET + ( lvl - 1 ) * 10 + i ) === 1;
+			document.querySelector( 'label[for="checkbox-challenge-' + ( i + 1 ) + '-unlocked"]' ).innerText = SavegameEditor.Constants.CHALLENGES[ lvl ][ i ];
+			getField( 'challenge-' + ( i + 1 ) + '-unlocked' ).checked = tempFile.readU8( profileStartOffset + SavegameEditor.Constants.CHALLENGE_OFFSET + ( lvl ) * 10 + i ) === 1;
 		}
 	},
-	_loadProfile: function () {
-		const profileStartOffset = SavegameEditor._getProfileOffset();
+	_create_mission_select: function ( id, func ) {
+		const missionSelect = document.createElement( 'select' );
+		missionSelect.id = `select-${ id }`;
+		missionSelect.className = 'full-width';
+		missionSelect.addEventListener( 'change', func, false );
+		SavegameEditor.Constants.CHAPTERS.forEach( ( chapter, index ) => {
+			const optgroup = missionSelect.appendChild( document.createElement( 'optgroup' ) );
+			optgroup.label = chapter;
+			for ( let i = 0; i < 3; i++ ) {
+				const selectEle = optgroup.appendChild( document.createElement( 'option' ) );
+				selectEle.value = String( index * 3 + i );
+				selectEle.textContent = SavegameEditor.Constants.MISSIONS[ index * 3 + i ];
+			}
+		} );
+		return missionSelect;
+	},
+	_load_profile: function () {
+		const self = SavegameEditor,
+			profileStartOffset = self._getProfileOffset();
 
-		setValue( 'blue-stones', tempFile.readU24( profileStartOffset + SavegameEditor.Constants.BLUE_STONES_OFFSET ) );
+		setValue( 'blue-stones', tempFile.readU24( profileStartOffset + self.Constants.BLUE_STONES_OFFSET ) );
 		setValue( 'levels', '1' );
 		let field, a, b, c;
-		for ( c = 0; c < SavegameEditor.Constants.CHARACTERS.length; c++ ) {
+		for ( c = 0; c < self.Constants.CHARACTERS.length; c++ ) {
 			field = getField( 'select-character-' + c );
-			a = convertToBit(
-				tempFile.readU8(
-					profileStartOffset +
-					SavegameEditor.Constants.CHARACTER_OFFSET +
-					Number( field.dataset.offset )
-				), 8
-			);
+			a = convert_to_bit( tempFile.readU8( profileStartOffset + self.Constants.CHARACTER_OFFSET + Number( field.dataset.offset ) ), 8 );
 			b = ( a[ field.dataset.offset_ * 2 ] === '1' ) ? '2' : ( ( a[ field.dataset.offset_ * 2 + 1 ] === '1' ) ? '1' : '0' );
 			setValue( 'character-' + c, Number( b ) );
 		}
-		const bought = convertToBit(
-				tempFile.readU16(
-					profileStartOffset +
-					SavegameEditor.Constants.UPGRADES_OFFSET +
-					2
-				), 16
-			),
-			unlocked = convertToBit(
-				tempFile.readU16(
-					profileStartOffset +
-					SavegameEditor.Constants.UPGRADES_OFFSET
-				), 16
-			);
-		for ( c = 0; c < SavegameEditor.Constants.UPGRADES.length; c++ ) {
+		const bought = convert_to_bit( tempFile.readU16( profileStartOffset + self.Constants.UPGRADES_OFFSET + 2 ), 16 ),
+			unlocked = convert_to_bit( tempFile.readU16( profileStartOffset + self.Constants.UPGRADES_OFFSET ), 16 );
+		for ( c = 0; c < self.Constants.UPGRADES.length; c++ ) {
 			field = getField( 'select-upgrade-' + c );
 			b = ( bought[ field.dataset.offset ] === '1' ) ? '2' : ( ( unlocked[ field.dataset.offset ] === '1' ) ? '1' : '0' );
 			setValue( 'upgrade-' + c, Number( b ) );
 		}
-		setValue( 'last-played', tempFile.readU8( profileStartOffset + SavegameEditor.Constants.LEVEL_LAST_PLAYED_OFFSET ) );
-		SavegameEditor._loadLevel();
+		setValue( 'last-played', tempFile.readU8( profileStartOffset + self.Constants.LEVEL_LAST_PLAYED_OFFSET ) );
+		self._load_level();
 		for ( let l = 1; l < 16; l++ ) {
-			setValue( 'section-status-' + l, SavegameEditor._getSectionStatus( l ) );
+			setValue( 'section-status-' + l, self._get_section_status( l ) );
 		}
 	},
 
@@ -257,66 +248,92 @@ SavegameEditor = {
 	},
 
 	preload: function () {
-		get( 'toolbar' ).children[ 0 ].appendChild( select( 'profile-selector', this.Constants.PROFILES, this._loadProfile ) );
-		get( 'container-language' ).appendChild( select( 'language', SavegameEditor.Constants.LANGUAGES, SavegameEditor._writeLanguage ) );
-		get( 'container-levelselection' ).appendChild( select( 'levels', SavegameEditor.Constants.LEVELS, SavegameEditor._loadLevel ) );
+		const self = this;
+		get( 'toolbar' ).children[ 0 ].appendChild( select( 'profile-selector', this.Constants.PROFILES, this._load_profile ) );
+		get( 'container-language' ).appendChild( select( 'language', self.Constants.LANGUAGES, self._write_language ) );
+		get( 'container-levelselection' ).appendChild( this._create_mission_select( 'levels', self._load_level ) );
 		for ( let i = 0; i < 10; i++ ) {
-			getField( 'challenge-' + ( i + 1 ) + '-unlocked' ).addEventListener( 'change', SavegameEditor._writeChallenge );
+			getField( 'challenge-' + ( i + 1 ) + '-unlocked' ).addEventListener( 'change', self._write_challenge );
 		}
-		get( 'container-last-played' ).appendChild( select( 'last-played', SavegameEditor.Constants.LEVELS, SavegameEditor._writeLastPlayed ) );
-		get( 'input-level-stones' ).addEventListener( 'change', SavegameEditor._writeLevelStones );
-		get( 'input-blue-stones' ).addEventListener( 'change', SavegameEditor._writeBlueStones );
-		getField( 'checkbox-microphone' ).addEventListener( 'change', SavegameEditor._writeSoundSettings );
-		getField( 'checkbox-music' ).addEventListener( 'change', SavegameEditor._writeSoundSettings );
+		get( 'container-last-played' ).appendChild( this._create_mission_select( 'last-played', self._write_last_played ) );
+		get( 'input-level-stones' ).addEventListener( 'change', self._write_level_stones );
+		get( 'input-blue-stones' ).addEventListener( 'change', self._write_blue_stones );
+		getField( 'checkbox-microphone' ).addEventListener( 'change', self._write_sound_settings );
+		getField( 'checkbox-music' ).addEventListener( 'change', self._write_sound_settings );
 		setNumericRange( 'blue-stones', 0, 16777215 );
 		const tmp1 = get( 'character-list' );
-		for ( let j = 0; j < SavegameEditor.Constants.CHARACTERS.length; j++ ) {
-			tmp1.appendChild( col( 2, span( SavegameEditor.Constants.CHARACTERS[ j ] ) ) );
-			const sel = select( 'character-' + j, SavegameEditor.Constants.CHARACTER_OPTIONS, SavegameEditor._writeCharacter );
+		for ( let j = 0; j < self.Constants.CHARACTERS.length; j++ ) {
+			const characterName = self.Constants.CHARACTERS[ j ];
+			const characterIcon = document.createElement( 'img' ),
+				characterCol = col( 1, characterIcon );
+			characterCol.className += ' text-center';
+			characterIcon.className = 'character-icon';
+			characterIcon.loading = 'lazy';
+			characterIcon.width = '32';
+			characterIcon.height = '32';
+			characterIcon.src = `characters/${ characterName.replace( '?', '' ).replace( /"/g, '' ) }.png`;
+			tmp1.appendChild( characterCol );
+			tmp1.appendChild( col( 2, span( characterName ) ) );
+			const sel = select( 'character-' + j, self.Constants.CHARACTER_OPTIONS, self._write_character );
 			sel.dataset.offset = Math.floor( j * 0.25 );
 			sel.dataset.offset_ = 3 - ( j - sel.dataset.offset * 4 );
-			tmp1.appendChild( col( 4, sel ) );
+			tmp1.appendChild( col( 3, sel ) );
 		}
 		const tmp2 = get( 'upgrades-list' );
-		for ( let k = 0; k < SavegameEditor.Constants.UPGRADES.length; k++ ) {
-			tmp2.appendChild( col( 2, span( SavegameEditor.Constants.UPGRADES[ k ] ) ) );
-			const sel_ = select( 'upgrade-' + k, SavegameEditor.Constants.CHARACTER_OPTIONS, SavegameEditor._writeUpgrade );
+		for ( let k = 0; k < self.Constants.UPGRADES.length; k++ ) {
+			const upgradeName = self.Constants.UPGRADES[ k ];
+			const upgradeIcon = document.createElement( 'img' ),
+				upgradeCol = col( 1, upgradeIcon );
+			upgradeCol.className += ' text-center';
+			upgradeIcon.className = 'upgradeIcon';
+			upgradeIcon.loading = 'lazy';
+			upgradeIcon.width = '32';
+			upgradeIcon.height = '32';
+			upgradeIcon.src = `upgrades/${ upgradeName }.png`;
+			tmp2.appendChild( upgradeCol );
+			tmp2.appendChild( col( 2, span( self.Constants.UPGRADES[ k ] ) ) );
+			const sel_ = select( 'upgrade-' + k, self.Constants.CHARACTER_OPTIONS, self._write_upgrade );
 			sel_.dataset.offset = k;
-			tmp2.appendChild( col( 4, sel_ ) );
+			tmp2.appendChild( col( 3, sel_ ) );
 		}
+		tmp2.appendChild( col( 6, span( '' ) ) );
 		const tmp3 = get( 'sections-list' );
 		for ( let l = 1; l < 16; l++ ) {
-			const sel__ = select( 'section-status-' + l, SavegameEditor.Constants.SECTION_UNLOCK_STATUS, SavegameEditor._writeSectionStatus );
+			const sel__ = select( 'section-status-' + l, self.Constants.SECTION_UNLOCK_STATUS, self._write_section_status );
 			sel__.dataset.section = l;
 			tmp3.append(
 				col( 2, span( 'S' + l + ' (Level ' + ( ( l - 1 ) * 3 + 1 ) + '-' + ( l * 3 ) + ')' ) ),
 				col( 4, sel__ )
 			);
 		}
+		tmp3.appendChild( col( 6, span( '' ) ) );
 	},
 
 	/* load function */
 	load: function () {
+		const self = this;
 		tempFile.fileName = 'savegame.dat';
 		tempFile.littleEndian = true;
 		// eslint-disable-next-line no-console
 		console.log( '[%cThe Lego Movie Videogame%c]', 'color:orange', 'color:inherit', 'Old CRC32 ', tempFile.readU32( 0 ) );
 		// eslint-disable-next-line no-console
 		console.log( '[%cThe Lego Movie Videogame%c]', 'color:orange', 'color:inherit', 'Calced CRC32 ', SavegameEditor.crc32( tempFile, tempFile.fileSize, 24 ) );
-		setValue( 'language', tempFile.readU8( SavegameEditor.Constants.LANGUAGE_OFFSET ) );
-		setValue( 'savegame', 'Save game #' + ( tempFile.readU8( SavegameEditor.Constants.PROFILE_SELECTION_OFFSET ) + 1 ) );
-		getField( 'checkbox-microphone' ).checked = tempFile.readU8( SavegameEditor.Constants.SETTINGS_MUSIC_MICROPHONE_OFFSET ) > 0;
-		getField( 'checkbox-music' ).checked = tempFile.readU8( SavegameEditor.Constants.SETTINGS_MUSIC_MICROPHONE_OFFSET ) > 100;
-		this._loadProfile();
+
+		setValue( 'language', tempFile.readU8( self.Constants.LANGUAGE_OFFSET ) );
+		setValue( 'savegame', 'Save game #' + ( tempFile.readU8( self.Constants.PROFILE_SELECTION_OFFSET ) + 1 ) );
+		getField( 'checkbox-microphone' ).checked = tempFile.readU8( self.Constants.SETTINGS_MUSIC_MICROPHONE_OFFSET ) > 0;
+		getField( 'checkbox-music' ).checked = tempFile.readU8( self.Constants.SETTINGS_MUSIC_MICROPHONE_OFFSET ) > 100;
+		this._load_profile();
 	},
 
 	/* save function */
 	save: function () {
+		const self = this;
 		// eslint-disable-next-line no-console
-		console.log( '[%cThe Lego Movie Videogame%c]', 'color:orange', 'color:inherit', 'New CRC32 ', SavegameEditor.crc32( tempFile, tempFile.fileSize, 24 ) );
+		console.log( '[%cThe Lego Movie Videogame%c]', 'color:orange', 'color:inherit', 'New CRC32 ', self.crc32( tempFile, tempFile.fileSize, 24 ) );
 		tempFile.writeU32(
 			0,
-			SavegameEditor.crc32( tempFile, tempFile.fileSize, 24 )
+			self.crc32( tempFile, tempFile.fileSize, 24 )
 		);
 	}
 };

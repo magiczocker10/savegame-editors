@@ -1,4 +1,3 @@
-/* stylelint-disable selector-max-id */
 #menu[ open ] {
 	border: 0 solid gray;
 	border-radius: 5px;
@@ -118,7 +117,7 @@
 
 #eyecolor input:checked + label {
 	background: gray;
-	color: #fff;
+	color: white;
 }
 
 input#eye_gray + label {

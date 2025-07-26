@@ -1,54 +1,52 @@
-/* eslint-disable no-undef, es-x/no-string-prototype-replaceall, no-underscore-dangle */
-/* globals get, tempFile */
-const spriteBaseURL = 'https://www.spriters-resource.com/resources/sheets/112/%0.png',
-	spriteBaseURLLocal = 'sprites/%0.png',
-	useLocal = false,
-	spriteData = {
-		// Dogs
-		bassetHound: [ '114733', 6 ],
-		beagle: [ '114732', 6 ],
-		boxer: [ '114888', 6 ],
-		bullTerrier: [ '114889', 6 ],
-		chihuahua: [ '114890', 6 ],
-		chihuahua1: [ '114890', 2 ],
-		cockerSpaniel: [ '114893', 5 ],
-		dalmatian: [ '114891', 6 ],
-		frenchBulldog: [ '114892', 5 ],
-		germanShepherdDog: [ '114896', 6 ],
-		goldenRetriever: [ '114737', 6 ],
-		greatDane: [ '114895', 6 ],
-		jackRussellTerrier: [ '114898', 6 ],
-		labradorRetriever: [ '114900', 5 ],
-		labradorRetriever1: [ '114900', 1 ],
-		maltese: [ '114734', 6 ],
-		miniatureDachshund: [ '114902', 5 ],
-		miniatureDachshund1: [ '114902', 1 ],
-		miniaturePinscher: [ '114903', 5 ],
-		miniatureSchnauzer: [ '114904', 5 ],
-		miniatureSchnauzer1: [ '114904', 1 ],
-		pembrokeWelshCorgi: [ '114899', 6 ],
-		pomeranian: [ '114907', 6 ],
-		pomeranian1: [ '114907', 1 ],
-		pug: [ '114906', 5 ],
-		roboPup: [ '114735', 5 ],
-		shetlandSheepdog: [ '114912', 6 ],
-		shiba: [ '114908', 5 ],
-		shihTzu: [ '114909', 5 ],
-		siberianHusky: [ '114897', 6 ],
-		spaniel: [ '114901', 5 ],
-		toyPoodle: [ '114905', 5 ],
-		toyPoodle1: [ '114905', 1 ],
-		yorkshireTerrier: [ '114736', 6 ],
-		// Cats
-		standard: [ '114911', 6 ],
-		oriental: [ '114910', 6 ],
-		longhair: [ '114894', 18 ]
-	};
+const spriteBaseURL = 'https://www.spriters-resource.com/resources/sheets/112/%0.png';
+const spriteBaseURLLocal = 'sprites/%0.png';
+const useLocal = false;
+const spriteData = {
+	// Dogs
+	basset_hound: { sprite_id: '114733', row: 6 },
+	beagle: { sprite_id: '114732', row: 6 },
+	boxer: { sprite_id: '114888', row: 6 },
+	bull_terrier: { sprite_id: '114889', row: 6 },
+	chihuahua: { sprite_id: '114890', row: 6 },
+	chihuahua1: { sprite_id: '114890', row: 2 },
+	cocker_spaniel: { sprite_id: '114893', row: 5 },
+	dalmatian: { sprite_id: '114891', row: 6 },
+	french_bulldog: { sprite_id: '114892', row: 5 },
+	german_shepherd_dog: { sprite_id: '114896', row: 6 },
+	golden_retriever: { sprite_id: '114737', row: 6 },
+	great_dane: { sprite_id: '114895', row: 6 },
+	jack_russell_terrier: { sprite_id: '114898', row: 6 },
+	labrador_retriever: { sprite_id: '114900', row: 5 },
+	labrador_retriever1: { sprite_id: '114900', row: 1 },
+	maltese: { sprite_id: '114734', row: 6 },
+	miniature_dachshund: { sprite_id: '114902', row: 5 },
+	miniature_dachshund1: { sprite_id: '114902', row: 1 },
+	miniature_pinscher: { sprite_id: '114903', row: 5 },
+	miniature_schnauzer: { sprite_id: '114904', row: 5 },
+	miniature_schnauzer1: { sprite_id: '114904', row: 1 },
+	pembroke_welsh_corgi: { sprite_id: '114899', row: 6 },
+	pomeranian: { sprite_id: '114907', row: 6 },
+	pomeranian1: { sprite_id: '114907', row: 1 },
+	pug: { sprite_id: '114906', row: 5 },
+	robo_pup: { sprite_id: '114735', row: 5 },
+	shetland_sheepdog: { sprite_id: '114912', row: 6 },
+	shiba: { sprite_id: '114908', row: 5 },
+	shih_tzu: { sprite_id: '114909', row: 5 },
+	siberian_husky: { sprite_id: '114897', row: 6 },
+	spaniel: { sprite_id: '114901', row: 5 },
+	toy_poodle: { sprite_id: '114905', row: 5 },
+	toy_poodle1: { sprite_id: '114905', row: 1 },
+	yorkshire_terrier: { sprite_id: '114736', row: 6 },
+	// Cats
+	standard: { sprite_id: '114911', row: 6 },
+	oriental: { sprite_id: '114910', row: 6 },
+	longhair: { sprite_id: '114894', row: 18 }
+};
 window.spriteData = spriteData;
 
 const _writeU8 = function ( variable, value ) {
 	tempFile.writeU8(
-		SavegameEditor.Constants.petOffset[ get( 'menu' ).dataset.pet ] + SavegameEditor.Constants[ variable ],
+		SavegameEditor.Constants.PET_OFFSET[ get( 'menu' ).dataset.pet ] + SavegameEditor.Constants[ variable ],
 		Number( value )
 	);
 };
@@ -56,52 +54,55 @@ const _writeU8 = function ( variable, value ) {
 window.addEventListener( 'load', () => {
 	'use strict';
 	const btnClose = document.getElementById( 'menu-close' ),
-		content = document.getElementById( 'menu-content' ),
-		eyecolor = document.getElementById( 'eyecolor' ),
 		menu = document.getElementById( 'menu' ),
-		sidebarCat = document.getElementById( 'menu-sidebar-cat' ),
-		sidebarDog = document.getElementById( 'menu-sidebar-dog' );
+		sidebar_dog = document.getElementById( 'menu-sidebar-dog' ),
+		sidebar_cat = document.getElementById( 'menu-sidebar-cat' ),
+		content = document.getElementById( 'menu-content' ),
+		eyecolor = document.getElementById( 'eyecolor' );
 
-	const sidebarEvent = function ( e ) {
+	const sidebar_event = function ( e ) {
 		if ( !e.target || !e.target.className || !e.target.className.startsWith( 'page-' ) ) {
 			return;
 		}
-		let old = sidebarDog.querySelector( 'div[open]' );
+		let old = sidebar_dog.querySelector( 'div[open]' );
 		if ( old ) {
 			old.removeAttribute( 'open' );
 			content.querySelector( '.' + old.className ).style.display = 'none';
 		}
-		old = sidebarCat.querySelector( 'div[open]' );
+		old = sidebar_cat.querySelector( 'div[open]' );
 		if ( old ) {
 			old.removeAttribute( 'open' );
 			content.querySelector( '.' + old.className ).style.display = 'none';
 		}
 		const tmp = e.target.className.match( /\d+/g );
-		menu.dataset.type = ( tmp[ 0 ] >= 29 && tmp[ 0 ] <= 31 ) ? 'cat' : 'dog';
-		e.target.setAttribute( 'open', true );
-		let eyeColorOffset = 255,
-			newContent = content.querySelector( '.' + e.target.className );
-		if ( menu.dataset.type === 'cat' ) {
-			eyeColorOffset = Number( document.getElementById( 'eyecolor' ).querySelector( ':checked' ).dataset.offset );
+		if ( tmp[ 0 ] >= 29 && tmp[ 0 ] <= 31 ) {
+			menu.dataset.type = 'cat';
+		} else {
+			menu.dataset.type = 'dog';
 		}
+		e.target.setAttribute( 'open', true );
+		let eye_color_offset = 255;
+		if ( menu.dataset.type === 'cat' ) {
+			eye_color_offset = Number( document.getElementById( 'eyecolor' ).querySelector( ':checked' ).dataset.offset );
+		}
+		let newContent = content.querySelector( '.' + e.target.className );
 		if ( newContent && menu.dataset.type === 'cat' ) {
 			newContent.parentElement.removeChild( newContent );
 			newContent = undefined;
 		}
 		if ( !newContent ) {
-			newContent = content.appendChild( document.createElement( 'div' ) );
-			// eslint-disable-next-line mediawiki/class-doc
+			newContent = document.createElement( 'div' );
 			newContent.className = e.target.className;
-			const offset = Number( e.target.getAttribute( 'image-offset' ) ),
-				sD = spriteData[ e.target.getAttribute( 'breed' ) ];
-			let offX = -4,
-				offY = -4 - 68 * Math.ceil( offset / sD[ 1 ] ),
-				color = 0,
-				style = 0;
-			const iMax = offset + Number( e.target.getAttribute( 'image-items' ) );
+			const offset = Number( e.target.getAttribute( 'image-offset' ) );
+			const sD = spriteData[ e.target.getAttribute( 'breed' ) ];
+			let offX = -4;
+			let offY = -4 - 68 * Math.ceil( offset / sD.row );
+			let color = 0;
+			let style = 0;
+			const i_max = offset + Number( e.target.getAttribute( 'image-items' ) );
 			let correctionXOffset = 0;
 			let correctionYOffset = 0;
-			for ( let i = offset; i < iMax; i++ ) {
+			for ( let i = offset; i < i_max; i++ ) {
 				if ( newContent.className === 'page-9-1' && color === 2 ) { // Fix for Labrador Retriever - Black
 					correctionYOffset = 68;
 				} else if ( newContent.className === 'page-17-22' ) { // Fix for German Shepherd Dog - White
@@ -109,9 +110,9 @@ window.addEventListener( 'load', () => {
 				} else if ( newContent.className === 'page-14-2' ) { // Fix for Miniature Schnauzer - Surprise Me #1
 					if ( i === 12 ) { // Correct image 1
 						correctionYOffset = 68 * 3;
-					} else if ( i === 13 ) { // Correct image 2
+					} else if ( i === 13 ) { // Correct 2
 						correctionYOffset = 68 * 7;
-					} else if ( i === 14 || i === 15 || i === 16 ) { // Correct images 3, 4 and 5
+					} else if ( i === 14 || i === 15 || i === 16 ) { // Correct 3, 4 and 5
 						correctionYOffset = -( 68 * 2 );
 					}
 				} else if ( newContent.className === 'page-14-12' ) { // Fix for Miniature Schnauzer - Surprise Me #2
@@ -121,22 +122,20 @@ window.addEventListener( 'load', () => {
 						correctionYOffset = -68;
 					}
 				}
-				if ( menu.dataset.type === 'dog' || ( i - offset ) % 3 === eyeColorOffset ) {
-					const baseURL = useLocal && spriteBaseURLLocal || spriteBaseURL,
-						ele = newContent.appendChild( document.createElement( 'div' ) );
+				if ( menu.dataset.type === 'dog' || ( i - offset ) % 3 === eye_color_offset ) {
+					const ele = document.createElement( 'div' );
+					const baseURL = useLocal && spriteBaseURLLocal || spriteBaseURL;
+					ele.style.backgroundImage = 'url(' + baseURL.replaceAll( '%0', sD.sprite_id ) + ')';
 					ele.className = 'sprite';
 					ele.dataset.color = color;
-					ele.dataset.eyeColor = eyeColorOffset;
+					ele.dataset.eye_color = eye_color_offset;
 					ele.dataset.style = style;
-					ele.style.backgroundImage = 'url(' + baseURL.replaceAll( '%0', sD[ 0 ] ) + ')';
 					ele.style.backgroundPosition = ( offX - correctionXOffset ) + 'px ' + ( offY - correctionYOffset ) + 'px';
+					newContent.appendChild( ele );
 					style++;
 				}
 				offX -= 68;
-				if (
-					( ( i - offset ) > 0 || sD[ 1 ] === 1 ) &&
-					( i - offset ) % sD[ 1 ] === sD[ 1 ] - 1
-				) {
+				if ( ( ( i - offset ) > 0 || sD.row === 1 ) && ( i - offset ) % sD.row == sD.row - 1 ) {
 					offX = -4;
 					offY -= 68;
 				}
@@ -146,35 +145,40 @@ window.addEventListener( 'load', () => {
 				}
 			}
 			newContent.style.width = 74 * ( e.target.dataset.percolor || 6 ) + 'px';
+			content.appendChild( newContent );
 		} else {
 			newContent.style.removeProperty( 'display' );
 		}
-		e.target.scrollIntoView();
+		e.target.scrollIntoViewIfNeeded();
+
 	};
-	window._sidebarEvent = sidebarEvent;
-	sidebarDog.addEventListener( 'click', sidebarEvent, false );
-	sidebarCat.addEventListener( 'click', sidebarEvent, false );
-	eyecolor.addEventListener( 'change', () => {
-		sidebarCat.querySelector( '[open]' ).click();
+	window._sidebar_event = sidebar_event;
+	sidebar_dog.addEventListener( 'click', sidebar_event, false );
+	sidebar_cat.addEventListener( 'click', sidebar_event, false );
+	eyecolor.addEventListener( 'change', ( e ) => {
+		sidebar_cat.querySelector( '[open]' ).click();
 	}, false );
 
 	content.addEventListener( 'click', ( e ) => {
 		if ( !e.target.className.includes( 'sprite' ) ) {
 			return;
 		}
-		const tmp = e.target.parentElement.className.match( /\d+/g ),
-			newImage = e.target.cloneNode();
+		const tmp = e.target.parentElement.className.match( /\d+/g );
 		_writeU8( 'PET_BREED_OFFSET', tmp[ 0 ] );
 		_writeU8( 'PET_BREED_VARIANT_OFFSET', tmp[ 1 ] );
 		_writeU8( 'PET_BREED_COLOR_OFFSET', e.target.dataset.color );
-		_writeU8( 'PET_BREED_EYE_COLOR_OFFSET', e.target.dataset.eyeColor );
+		_writeU8( 'PET_BREED_EYE_COLOR_OFFSET', e.target.dataset.eye_color );
 		_writeU8( 'PET_BREED_STYLE_OFFSET', e.target.dataset.style );
-		document.querySelector( 'label[for="pet_tab' + ( Number( get( 'menu' ).dataset.pet ) + 1 ) + '"] .sprite' ).replaceWith( newImage );
+		const newImage = e.target.cloneNode();
+		const newImage2 = e.target.cloneNode();
+		newImage.id = 'petimage' + ( Number( get( 'menu' ).dataset.pet ) + 1 );
+		document.getElementById( newImage.id ).replaceWith( newImage );
+		document.querySelector( 'label[for="pet_tab' + ( Number( get( 'menu' ).dataset.pet ) + 1 ) + '"] .sprite' ).replaceWith( newImage2 );
 		btnClose.click();
 	}, false );
 	btnClose.addEventListener( 'click', ( e ) => {
 		e.preventDefault();
 		menu.close();
 	}, false );
-	sidebarEvent( { target: document.getElementsByClassName( 'page-0-0' )[ 0 ] } );
+	sidebar_event( { target: document.getElementsByClassName( 'page-0-0' )[ 0 ] } );
 }, false );

@@ -3,6 +3,7 @@
 
 import type.time;
 struct main_t {
+	u8 miiVariousData[29] @ 0x19;
 	char16 miiNameOffset[10] @ 0x36 [[name("Mii name")]];
 	u8 miiAvatarDesign[50] @ 0x4A [[name("Specifies the mii avatar design.")]];
 	u32 moneyOffset @ 0xA0 [[name("Money balance")]];

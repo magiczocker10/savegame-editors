@@ -154,15 +154,26 @@ struct accessories_t {
 	u8 item0x194 @ 0x194 [[name("Yellow Woolly Hat")]];
 };
 
-struct bowls_t {
-	u8 whiteBowl @ 0x13E;
-	u8 greenBowl @ 0x13F;
-	u8 yellowBowl @ 0x140;
-	u8 redBowl @ 0x141;
-	u8 blackBowl @ 0x142;
-	u8 mushroomBowl @ 0x143;
-	u8 asiaBowl @ 0x144;
-	u8 woodenBowl @ 0x145;
+struct bowls_drink {
+	u8 steinlessSteelBowl @ $ [[name("Stainless Steel Bowl")]];
+	u8 greenBowl @ $ + 1 [[name("Green Bowl")]];
+	u8 yellowBowl @ $ + 2 [[name("Yellow Bowl")]];
+	u8 redBowl @ $ + 3 [[name("Red Bowl")]];
+	u8 urushiBowl @ $ + 4 [[name("Urushi Bowl")]];
+	u8 whitePolkaBowl @ $ + 5 [[name("White Polka-Dot Bowl")]];
+	u8 highClassBowl @ $ + 6 [[name("High-Class Bowl")]];
+	u8 woodenBowl @ $ + 7 [[name("Wooden Bowl")]];
+};
+
+struct bowls_food {
+	u8 whiteBowl @ $ [[name("White Bowl")]];
+	u8 greenBowl @ $ + 1 [[name("Green Bowl")]];
+	u8 yellowBowl @ $ + 2 [[name("Yellow Bowl")]];
+	u8 redBowl @ $ + 3 [[name("Red Bowl")]];
+	u8 blackBowl @ $ + 4 [[name("Pottery Bowl")]];
+	u8 pinkPolkaBowl @ $ + 5 [[name("Pink Polka-Dot Bowl")]];
+	u8 japaneseBowl @ $ + 6 [[name("Japanese-Style Bowl")]];
+	u8 woodenBowl @ $ + 7 [[name("Wooden Bowl")]];
 };
 
 struct food_drinks_t {
@@ -243,17 +254,32 @@ struct leashes_t {
 	u8 item0x130 @ 0x130 [[name("Yellow Leash")]];
 };
 
-struct skins_t {
-	u8 item0x207 @ 0x207 [[name("Active style / 0=Scandinavian, 1=Japanese, ...")]];
-	u8 item0x208 @ 0x208 [[name("0=Scandinavian")]];
-	u8 item0x209 @ 0x209 [[name("1=Japanese")]];
-	u8 item0x20A @ 0x20A [[name("2=Asian")]];
-	u8 item0x20B @ 0x20B [[name("3=Modern")]];
-	u8 item0x20C @ 0x20C [[name("4=Country")]];
-	u8 item0x20D @ 0x20D [[name("5=Luxerious House")]];
-	u8 item0x20E @ 0x20E [[name("6=Fairy Tale")]];
-	u8 item0x20F @ 0x20F [[name("7=Mario House")]];
-	u8 item0x210 @ 0x210 [[name("8=Futuristic")]];
+fn interiors(u8 a) {
+	match(a) {
+		(0): return "Scandinavian";
+		(1): return "Japanese";
+		(2): return "Asian";
+		(3): return "Modern";
+		(4): return "Country";
+		(5): return "Luxerious House";
+		(6): return "Fairy Tale";
+		(7): return "Mario House";
+		(8): return "Futuristic";
+	}
+	return "Unknown";
+};
+
+struct interiors_t {
+	u8 item0x207 @ 0x207 [[name("Active interior"), format("interiors")]];
+	u8 item0x208 @ 0x208 [[name("Scandinavian")]];
+	u8 item0x209 @ 0x209 [[name("Japanese")]];
+	u8 item0x20A @ 0x20A [[name("Asian")]];
+	u8 item0x20B @ 0x20B [[name("Modern")]];
+	u8 item0x20C @ 0x20C [[name("Country")]];
+	u8 item0x20D @ 0x20D [[name("Luxerious House")]];
+	u8 item0x20E @ 0x20E [[name("Fairy Tale")]];
+	u8 item0x20F @ 0x20F [[name("Mario House")]];
+	u8 item0x210 @ 0x210 [[name("Futuristic")]];
 };
 
 struct toys_t {
@@ -349,11 +375,12 @@ struct toys_t {
 
 struct supplies_t {
 	accessories_t accessorie @ 0x00 [[name("Accessories")]];
-	bowls_t bowls @ 0x00 [[name("Bowls")]];
+	bowls_drink drinkBowls @ 0x136 [[name("Bowls (Drinks)")]];
+	bowls_food foodBowls @ 0x13E [[name("Bowls (Food)")]];
 	food_drinks_t fooddrinks @ 0x00 [[name("Food & Drinks")]];
 	furnitures_t furnitures @ 0x00 [[name("Furnitures")]];
 	leashes_t leashes @ 0x00 [[name("Leashes")]];
-	skins_t skins @ 0x00 [[name("Skins")]];
+	interiors_t interiors @ 0x00 [[name("Interiors")]];
 	toys_t toys @ 0x00 [[name("Toys")]];
 };
 

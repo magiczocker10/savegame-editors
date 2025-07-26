@@ -60,11 +60,48 @@
 	display: inline-block;
 	height: 32px;
 	image-rendering: pixelated;
-	margin-right: 3px;
+	margin-right: 6px;
 	pointer-events: none;
 	user-select: none;
 	vertical-align: middle;
 	width: 32px;
+}
+
+.item-name {
+	display: inline-block;
+	vertical-align: middle;
+	width: 80%;
+}
+
+.item-name[ data-icon ]::before {
+	background-image: url( ./icons.png );
+	background-repeat: no-repeat;
+	background-size: 68px;
+	content: '';
+	display: inline-block;
+	filter: invert( 1 );
+	height: 21px;
+	margin-right: 3px;
+	pointer-events: none;
+	user-select: none;
+	vertical-align: text-bottom;
+	width: 17px;
+}
+
+.item-name[ data-icon='1' ]::before {
+	background-position-x: 0;
+}
+
+.item-name[ data-icon='2' ]::before {
+	background-position-x: -17px;
+}
+
+.item-name[ data-icon='3' ]::before {
+	background-position-x: -34px;
+}
+
+.item-name[ data-icon='4' ]::before {
+	background-position-x: -51px;
 }
 
 /* Fix */

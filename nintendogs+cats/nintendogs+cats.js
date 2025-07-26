@@ -169,27 +169,33 @@ SavegameEditor = {
 		return ( tempFile.fileSize === 60936 );
 	},
 	appendItem: function ( rowtype ) {
-		const items = SavegameEditor.Constants.items;
-		const rt = get( 'row-' + rowtype );
-		items[ rowtype ].forEach( ( item, index ) => {
+		const items = SavegameEditor.Constants.items,
+			rowname = rowtype[ 0 ],
+			rt = get( 'row-' + rowname ),
+			min = [ 'bowlsfood', 'bowlsdrink' ].includes( rowname ) ? 1 : 0;
+		items[ rowname ].forEach( ( item, index ) => {
 			if ( item[ 2 ] === undefined ) {
 				rt.append( col( 3, span( item[ 1 ] ) ) );
 			} else {
 				const itemIcon = document.createElement( 'span' ),
-					itemCol = col( 1, itemIcon );
-				itemCol.className += ' text-center';
+					itemCol = col( 3, itemIcon ),
+					itemName = itemCol.appendChild( document.createElement( 'span' ) );
 				itemIcon.className = 'item-icon';
 				itemIcon.style.backgroundPosition = `${ item[ 2 ] / 2 }px ${ item[ 3 ] / 2 }px`;
+				itemName.className = 'item-name';
+				itemName.textContent = item[ 1 ];
+				if ( item[ 4 ] ) {
+					itemName.dataset.icon = item[ 4 ];
+				}
 				rt.append( itemCol );
-				rt.append( col( 2, span( item[ 1 ] ) ) );
 			}
 			rt.append(
-				col( 1, inputNumber( 'supplies_' + rowtype + '_' + index + '_amount', 0, 99, tempFile.readU8( Number( item[ 0 ] ) ) ) )
+				col( 1, inputNumber( 'supplies_' + rowname + '_' + index + '_amount', index === 0 ? min : 0, rowtype[ 1 ], tempFile.readU8( Number( item[ 0 ] ) ) ) )
 			);
-			get( 'number-supplies_' + rowtype + '_' + index + '_amount' ).dataset.offset = item[ 0 ];
-			get( 'number-supplies_' + rowtype + '_' + index + '_amount' ).addEventListener( 'change', SavegameEditor._write_supply_amount );
+			get( 'number-supplies_' + rowname + '_' + index + '_amount' ).dataset.offset = item[ 0 ];
+			get( 'number-supplies_' + rowname + '_' + index + '_amount' ).addEventListener( 'change', SavegameEditor._write_supply_amount );
 		} );
-		const lastRow = SavegameEditor.Constants.items[ rowtype ].length % 3;
+		const lastRow = SavegameEditor.Constants.items[ rowname ].length % 3;
 		if ( lastRow !== 0 ) {
 			rt.append( col( ( 3 - lastRow ) * 4, span( '' ) ) );
 		}
@@ -226,12 +232,14 @@ SavegameEditor = {
 		get( 'number-walking-counter' ).addEventListener( 'change', SavegameEditor._write_walking_counter );
 
 		[
-			'fooddrink',
-			'toys',
-			'accessories',
-			'furniture',
-			'leashes',
-			'interiors'
+			[ 'fooddrink', 99 ],
+			[ 'toys', 99 ],
+			[ 'accessories', 99 ],
+			[ 'furnitures', 99 ],
+			[ 'leashes', 1 ],
+			[ 'bowlsdrink', 1 ],
+			[ 'bowlsfood', 1 ],
+			[ 'interiors', 8 ]
 		].forEach( SavegameEditor.appendItem );
 	},
 
@@ -419,6 +427,7 @@ SavegameEditor = {
 
 	/* save function */
 	save: function () {
+		tempFile.writeU8( 0x13D, 0 );
 		const changed_levels = document.querySelectorAll( '[data-data_changed]' );
 		for ( let i = 0; i < changed_levels.length; i++ ) {
 			const value_old = changed_levels[ i ].value;

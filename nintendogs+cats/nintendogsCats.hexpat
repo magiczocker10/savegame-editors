@@ -154,6 +154,17 @@ struct accessories_t {
 	u8 item0x194 @ 0x194 [[name("Yellow Woolly Hat")]];
 };
 
+struct bowls_t {
+	u8 whiteBowl @ 0x13E;
+	u8 greenBowl @ 0x13F;
+	u8 yellowBowl @ 0x140;
+	u8 redBowl @ 0x141;
+	u8 blackBowl @ 0x142;
+	u8 mushroomBowl @ 0x143;
+	u8 asiaBowl @ 0x144;
+	u8 woodenBowl @ 0x145;
+};
+
 struct food_drinks_t {
 	u8 item0xE8 @ 0xE8 [[name("Beef Jerky")]];
 	u8 item0xEA @ 0xEA [[name("Biscuit Bits")]];
@@ -338,6 +349,7 @@ struct toys_t {
 
 struct supplies_t {
 	accessories_t accessorie @ 0x00 [[name("Accessories")]];
+	bowls_t bowls @ 0x00 [[name("Bowls")]];
 	food_drinks_t fooddrinks @ 0x00 [[name("Food & Drinks")]];
 	furnitures_t furnitures @ 0x00 [[name("Furnitures")]];
 	leashes_t leashes @ 0x00 [[name("Leashes")]];
